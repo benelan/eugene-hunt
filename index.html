@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.body {
+				font-size: 16px;
+			}
+		</style>
+	</head>
+	<body onload="initialize()">
+		<h1> Eugene Treasure Hunt</h1>
+		<p>Go to the location shown in the picture and then click "check location" to see if you are correct. 
+		<br>If you are correct a new image will be shown.<p>
+		<img id="img" width="40%">
+		<p id="hint"></p>
+		<button onclick="check()">Check Location</button>
+		<button onclick="hint()">Show Hint</button>
+		<button onclick="next()">Next Level</button>
+		<button onclick="start()">Start Over</button>
+		<p id="respect"></p>
+		<script>
+			// INITIALIZE
+			console.log("Starting Game")
+			// lat/lng decimal place accuracy described at
+			// https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
+			var acc = 2;
+			var current = 0;
+			var respect = 0;
+			var places = [
+				{"lat": 44.046378,
+				"lng": -123.070363,
+				"img": "img/sign.jpg",
+				"hint": "If you can't find this sign, quit now."
+				},
+				{"lat": 44.041368,
+				"lng": -123.078851,
+				"img": "img/uo.jpg",
+				"hint": "for testing."
+				},
+				{"lat": 44.0507635,
+				"lng": -123.0709271,
+				"img": "img/river.jpg",
+				"hint": "Willamette River. Closest pedestrian bridge to the UO sign. Go to the middle."
+				},
+				{"lat": 44.056694,
+				"lng": -123.069104,
+				"img": "img/autzen.jpg",
+				"hint": "Football"
+				},
+				{"lat": 44.0560605,
+				"lng": -123.0757968,
+				"img": "img/cuthbert.jpg",
+				"hint": "Eugene's amphitheater. Go to the stage."
+				},
+				{"lat": 44.056941,
+				"lng": -123.0843523,
+				"img": "img/abp.jpg",
+				"hint": "Alton Baker Park bridge"
+				},
+				{"lat": 44.0580145,
+				"lng": -123.0928312,
+				"img": "img/butte.jpg",
+				"hint": "Go enjoy the view from Skinner's Butte. Go to the lookout."
+				},
+				{"lat": 44.049989,
+				"lng": -123.092752,
+				"img": "img/food.png",
+				"hint": "Go downtown and celebrate your hike with some food."
+				}
+			];
+
+			function initialize() {
+				if (current >= places.length) {
+					document.getElementById("img").src = "img/winning.png";
+					document.getElementById("hint").innerHTML = "You won!";
+					console.log("Game over")
+					return;
+				}
+				document.getElementById("img").src = places[current].img;
+				document.getElementById("hint").innerHTML = "Hint: ";
+				document.getElementById("respect").innerHTML = "Points: " + respect;
+			}
+
+			// BUTTON EVENTS
+			// check location
+			function check() {
+				if (current >= places.length) {
+					document.getElementById("hint").innerHTML = "You already won!";
+					return;
+				}
+				console.log("checking location");
+				if (navigator.geolocation) {
+			        navigator.geolocation.getCurrentPosition(compare, error, options);
+			    } else {
+			        console.log("Geolocation is not supported by this browser.");
+			    }	
+			}
+			// show hint
+			function hint() {
+				if (current >= places.length) {
+					document.getElementById("hint").innerHTML = "You already won!";
+					return;
+				}
+				console.log("showing hint");
+				document.getElementById("hint").innerHTML = "Hint: " + places[current].hint;
+			}
+
+			// tap out
+			function next() {
+				if (current >= places.length) {
+					document.getElementById("hint").innerHTML = "Stop trying to give up you already won.";
+					return;
+				}
+				if (confirm("Are you sure you want to give up on this location and lose a point?")) {
+					current += 1;
+					respect -= 1; // losing my respect
+					initialize();
+				}
+			}
+
+			// start over
+			function start() {
+				if (confirm("Starting over will reset your points. Are you sure?")) {
+					current = 0;
+					respect = 0;
+					initialize();
+				}
+			}
+
+			// GEO LOCATION
+			// compares the player position to the picture location
+			function compare(pos) {
+				// decimals removed so that the player can be
+				// in the general area of the place
+				console.log("Current Locaiton: " + pos.coords.latitude + ", " + pos.coords.longitude)
+				var playerLat = Math.round(pos.coords.latitude*10**acc)/10**acc
+				var playerLng = Math.round(pos.coords.longitude*10**acc)/10**acc
+
+				var placeLat = Math.round(places[current].lat*10**acc)/10**acc
+				var placeLng = Math.round(places[current].lng*10**acc)/10**acc
+				// if the player is at the place
+				if ((playerLat == placeLat) && (playerLng == placeLng)) {
+					console.log("Correct location")
+					respect += 1; // gaining my respect
+					current += 1; // next level
+					initialize();
+				}
+				else {
+					document.getElementById("hint").innerHTML = "Hint: Try again!";
+					console.log("Incorrect location")
+				}
+
+			}
+			// geo options
+			var options = {
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 0
+			};
+			// geo error
+			function error(err) {
+				console.warn(`ERROR(${err.code}): ${err.message}`);
+			}
+		</script>
+	</body>
+</html>

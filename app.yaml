@@ -1,0 +1,23 @@
+#runtime: python27
+#api_version: 1
+#threadsafe: true
+#
+#handlers:
+#- url: /.*
+#  script: main.app
+
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /
+  static_files: index.html
+  upload: index.html
+
+- url: /(.*)
+  static_files: \1
+  upload: (.*)
+
+#- url: /.*
+#  script: main.app
