@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
 	<head>
 		<style>
@@ -9,9 +10,10 @@
 	</head>
 	<body onload="initialize()">
 		<h1> Eugene Treasure Hunt</h1>
-		<p>Go to the location shown in the picture and then click "check location" to see if you are correct. 
+		<p>Go to the location shown in the picture.
+		<br>Then click "check location" to see if you are correct. 
 		<br>If you are correct a new image will be shown.<p>
-		<img id="img" width="40%">
+		<img id="img" width="100%">
 		<p id="hint"></p>
 		<button onclick="check()">Check Location</button>
 		<button onclick="hint()">Show Hint</button>
@@ -21,26 +23,26 @@
 		<script>
 			// INITIALIZE
 			console.log("Starting Game")
-			// lat/lng decimal place accuracy described at
+			 // lat/lng decimal place accuracy described at
 			// https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
 			var acc = 2;
-			var current = 0;
-			var respect = 0;
-			var places = [
+			var current = 0;  // current place
+			var respect = 0; // game points
+			var places = [  // the place data structure
 				{"lat": 44.046378,
 				"lng": -123.070363,
 				"img": "img/sign.jpg",
 				"hint": "If you can't find this sign, quit now."
 				},
-				{"lat": 44.041368,
-				"lng": -123.078851,
+				{"lat": 44.045429,
+				"lng": -123.078438,
 				"img": "img/uo.jpg",
 				"hint": "for testing."
 				},
 				{"lat": 44.0507635,
 				"lng": -123.0709271,
 				"img": "img/river.jpg",
-				"hint": "Willamette River. Closest pedestrian bridge to the UO sign. Go to the middle."
+				"hint": "Willamette River. Closest pedestrian bridge to the UO sign. Go to the middle of the bridge."
 				},
 				{"lat": 44.056694,
 				"lng": -123.069104,
@@ -55,7 +57,7 @@
 				{"lat": 44.056941,
 				"lng": -123.0843523,
 				"img": "img/abp.jpg",
-				"hint": "Alton Baker Park bridge"
+				"hint": "Alton Baker Park bridge. Go to the middle of the bridge"
 				},
 				{"lat": 44.0580145,
 				"lng": -123.0928312,
@@ -68,8 +70,9 @@
 				"hint": "Go downtown and celebrate your hike with some food."
 				}
 			];
-
+			// sets the new image, resets hint, and gain/lose my respect
 			function initialize() {
+				// first checks if the game already ended
 				if (current >= places.length) {
 					document.getElementById("img").src = "img/winning.png";
 					document.getElementById("hint").innerHTML = "You won!";
@@ -81,9 +84,10 @@
 				document.getElementById("respect").innerHTML = "Points: " + respect;
 			}
 
-			// BUTTON EVENTS
+			 // BUTTON EVENTS
 			// check location
 			function check() {
+				// first checks if the game already ended
 				if (current >= places.length) {
 					document.getElementById("hint").innerHTML = "You already won!";
 					return;
@@ -97,6 +101,7 @@
 			}
 			// show hint
 			function hint() {
+				// first checks if the game already ended
 				if (current >= places.length) {
 					document.getElementById("hint").innerHTML = "You already won!";
 					return;
@@ -107,6 +112,7 @@
 
 			// tap out
 			function next() {
+				// first checks if the game already ended
 				if (current >= places.length) {
 					document.getElementById("hint").innerHTML = "Stop trying to give up you already won.";
 					return;
@@ -127,10 +133,10 @@
 				}
 			}
 
-			// GEO LOCATION
+			 // GEO LOCATION
 			// compares the player position to the picture location
 			function compare(pos) {
-				// decimals removed so that the player can be
+				 // decimals removed so that the player can be
 				// in the general area of the place
 				console.log("Current Locaiton: " + pos.coords.latitude + ", " + pos.coords.longitude)
 				var playerLat = Math.round(pos.coords.latitude*10**acc)/10**acc
